@@ -1,7 +1,6 @@
 from enum import Enum
 
-
-class Countries(str, Enum):
+class Country(str, Enum):
     AFGHANISTAN = 'afghanistan'
     ALBANIA = 'albania'
     ALGERIA = 'algeria'
@@ -176,3 +175,9 @@ class Countries(str, Enum):
     BRITISH_VIRGIN_ISLANDS = 'virginislands'
     ZAMBIA = 'zambia'
     ZIMBABWE = 'zimbabwe'
+
+    """ 
+    Get the name of the country.
+    """
+    def get_name(self) -> str:
+        return self.name
