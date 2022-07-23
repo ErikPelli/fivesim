@@ -80,7 +80,7 @@ class _APIRequest:
         :raises InvalidResultError: when the requested keys aren't in the output
         """
         try:
-            result = json.load(input, object_hook=into_object, )
+            result = json.loads(input, object_hook=into_object)
         except:
             result = {}
 
