@@ -17,3 +17,10 @@ class BadRequestError(FiveSimError):
 
     def __init__(self, description: str) -> None:
         super().__init__(description)
+
+
+class InvalidResultError(FiveSimError):
+    '''Raised when the FiveSim response is invalid'''
+
+    def __init__(self, invalid_value: str) -> None:
+        super().__init__(invalid_value)

@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from enum import Enum
 
 
@@ -22,6 +23,11 @@ class Status(str, Enum):
         :param status: the uppercase key
         """
         return cls[status]
+
+
+class Language(str, Enum):
+    ENGLISH = 'en'
+    RUSSIAN = 'ru'
 
 
 class Operator(str, Enum):
@@ -259,8 +265,12 @@ class Country(str, Enum):
         return self.name
 
 
-class Product:
+class Product(ABC):
     '''A product that you can buy on the 5SIM website'''
+
+    @abstractmethod
+    def __str__(self) -> str:
+        ...
 
 
 class HostingProduct(str, Enum, Product):
@@ -268,6 +278,9 @@ class HostingProduct(str, Enum, Product):
     ONE_DAY = '1day'
     TEN_DAYS = '10days'
     ONE_MONTH = '1month'
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class ActivationProduct(str, Enum, Product):
@@ -580,3 +593,6 @@ class ActivationProduct(str, Enum, Product):
     ZALO = 'zalo'
     ZOHO = 'zoho'
     ZOMATO = 'zomato'
+
+    def __str__(self) -> str:
+        return self.value
