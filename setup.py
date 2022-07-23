@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='5sim',
+    name='fivesim',
     version='1.0.0',
     description='Python API client for 5sim.net',
-    url='https://github.com/ErikPelli/5sim',
+    url='https://github.com/ErikPelli/fivesim',
     author='Erik Pellizzon',
     author_email='erikpellizzon@gmail.com',
     license='MIT',
