@@ -1,4 +1,4 @@
-from errors import FiveSimError, InvalidAPIKeyError, BadRequestError
+from errors import InvalidAPIKeyError, BadRequestError
 import requests
 from typing import Any, Callable, NamedTuple
 
