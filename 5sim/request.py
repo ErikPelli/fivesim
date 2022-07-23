@@ -1,6 +1,6 @@
 from errors import InvalidAPIKeyError, BadRequestError
 import requests
-from typing import Any, Callable, NamedTuple
+from typing import Any, Callable, Dict, NamedTuple
 
 
 class _APIResult(NamedTuple):
@@ -15,24 +15,28 @@ class _APIRequest:
         self.__endpoint = endpoint
         self.__authentication_token = auth_token
 
-    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool) -> requests.Response:
+    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool, params: dict) -> requests.Response:
         headers = {"Accept": "application/json"}
         if use_token:
             headers["Authorization"] = "Bearer " + self.__authentication_token
-        return method(url=self.__endpoint + name, headers=headers)
+        return method(url=self.__endpoint + name, headers=headers, params=params)
 
-    def _GET(self, use_token: bool, path: str) -> _APIResult:
+    def _GET(self, use_token: bool, path: str, parameters: Dict[str, str]) -> _APIResult:
         """
         Make a GET request to the API.
 
         :param use_token: Specify wheter to include the authentication token in the request
         :param path: Specify the part after the domain to invoke in the API
         """
-        result = self.__request(method=requests.get,
-                                name=path, use_token=use_token)
+        result = self.__request(
+            method=requests.get,
+            name=path,
+            use_token=use_token,
+            params=parameters
+        )
         return _APIResult(status_code=result.status_code, body=result.text, status_description=result.reason)
 
-    def _POST(self, use_token: bool, path: str) -> _APIResult:
+    def _POST(self, use_token: bool, path: str, parameters: Dict[str, str]) -> _APIResult:
         """
         Make a POST request to the API.
 
@@ -40,8 +44,12 @@ class _APIRequest:
         :param path: Specify the part after the domain to invoke in the API
         :return: A tuple with the HTTP Status Code and the Body of the Response
         """
-        result = self.__request(method=requests.post,
-                                name=path, use_token=use_token)
+        result = self.__request(
+            method=requests.post,
+            name=path,
+            use_token=use_token,
+            params=parameters
+        )
         return _APIResult(status_code=result.status_code, body=result.text)
 
     @staticmethod

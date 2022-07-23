@@ -1,5 +1,7 @@
 class FiveSimError(Exception):
     '''An error returned by the 5 SIM API'''
+    def get_message(self) -> str:
+        return super.message if hasattr(super, "message") else ""
 
 class InvalidAPIKeyError(FiveSimError):
     '''Raised when the API Key is invalid'''
