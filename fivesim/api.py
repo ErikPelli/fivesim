@@ -1,6 +1,5 @@
 from typing import Any
-from fivesim.errors import FiveSimError
-from fivesim.order import ActivationProduct, Country, HostingProduct, Language, Operator, Product
+from fivesim.order import Country, Language, Operator, Product
 from fivesim.request import _APIRequest
 from fivesim.response import ProductInformation, _parse_products
 
@@ -18,8 +17,10 @@ class GuestAPI(_APIRequest):
         """
         Get available products by country.
 
-        :param lang: Language of notification, Russian or English
-        :return: notification text
+        :param country: Country selection, ANY_COUNTRY is possible
+        :param operator: Operator selection, ANY_OPERATOR is possible
+        :return: dictionary with the association between a Product and its information,
+                 use isinstance() to check if the Product is ActivationProduct or HostingProduct
         :raises FiveSimError: if the response is invalid
         """
         api_result = super()._GET(

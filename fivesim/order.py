@@ -83,6 +83,7 @@ class Operator(str, Enum):
 
 
 class Country(str, Enum):
+    ANY_COUNTRY = 'any'
     AFGHANISTAN = 'afghanistan'
     ALBANIA = 'albania'
     ALGERIA = 'algeria'
