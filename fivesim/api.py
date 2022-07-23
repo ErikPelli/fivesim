@@ -1,5 +1,5 @@
 from typing import Any
-from fivesim.order import Country, Language, Operator, Product
+from fivesim.order import ActivationProduct, Country, HostingProduct, Language, Operator
 from fivesim.request import _APIRequest
 from fivesim.response import ProductInformation, _parse_products
 
@@ -13,7 +13,7 @@ class GuestAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/guest/", auth_token=api_key)
 
-    def get_products(self, country: Country, operator: Operator) -> dict[Product, ProductInformation]:
+    def get_products(self, country: Country, operator: Operator) -> dict[ActivationProduct|HostingProduct, ProductInformation]:
         """
         Get available products by country.
 
