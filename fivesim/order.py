@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from enum import Enum
 
 
@@ -30,6 +29,11 @@ class Language(str, Enum):
     RUSSIAN = 'ru'
 
 
+class Category(str, Enum):
+    HOSTING = 'hosting'
+    ACTIVATION = 'activation'
+
+
 class Operator(str, Enum):
     ANY_OPERATOR = 'any'
     N_019 = '019'
@@ -40,6 +44,8 @@ class Operator(str, Enum):
     EE = 'ee'
     GLOBE = 'globe'
     KCELL = 'kcell'
+    KYIVSTAR = 'kyivstar'
+    LEBARA = 'lebara'
     LYCAMOBILE = 'lycamobile'
     MATRIX = 'matrix'
     MEGAFON = 'megafon'
@@ -49,6 +55,7 @@ class Operator(str, Enum):
     PLAY = 'play'
     REDBULLMOBILE = 'redbullmobile'
     ROSTELECOM = 'rostelecom'
+    SYMA = 'syma'
     SMART = 'smart'
     SUN = 'sun'
     TELE2 = 'tele2'
@@ -62,6 +69,7 @@ class Operator(str, Enum):
     VIRTUAL5 = 'virtual5'
     VIRTUAL7 = 'virtual7'
     VIRTUAL8 = 'virtual8'
+    VIRTUAL11 = 'virtual11'
     VIRTUAL12 = 'virtual12'
     VIRTUAL15 = 'virtual15'
     VIRTUAL16 = 'virtual16'
@@ -77,6 +85,10 @@ class Operator(str, Enum):
     VIRTUAL26 = 'virtual26'
     VIRTUAL27 = 'virtual27'
     VIRTUAL28 = 'virtual28'
+    VIRTUAL29 = 'virtual29'
+    VIRTUAL30 = 'virtual30'
+    VIRTUAL31 = 'virtual31'
+    VIRTUAL32 = 'virtual32'
     VODAFONE = 'vodafone'
     YOTA = 'yota'
     ZZ = 'zz'
