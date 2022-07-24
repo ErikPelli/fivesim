@@ -1,8 +1,7 @@
-from typing import Any
 from fivesim.errors import BadRequestError
-from fivesim.order import ActivationProduct, Country, HostingProduct, Language, Operator
+from fivesim.order import ActivationProduct, Country, HostingProduct, Language, Operator, VendorPaymentMethod, VendorPaymentSystem
 from fivesim.request import _APIRequest
-from fivesim.response import CountryInformation, ProductInformation, _parse_guest_countries, _parse_guest_prices, _parse_guest_products
+from fivesim.response import CountryInformation, ProductInformation, VendorWallet, _parse_guest_countries, _parse_guest_prices, _parse_guest_products
 
 
 class UserAPI(_APIRequest):
@@ -56,7 +55,7 @@ class GuestAPI(_APIRequest):
             parameters=params
         )
         if api_result.body == "null":
-            raise BadRequestError("Product isn't available for the selected country")
+            raise BadRequestError("Product isn't available for the country")
         return super()._parse_json(
             input=api_result.body,
             into_object=_parse_guest_prices
@@ -100,3 +99,43 @@ class GuestAPI(_APIRequest):
 class VendorAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/vendor/", auth_token=api_key)
+
+    def get_wallets_reserve(self) -> VendorWallet:
+        """
+        Get the wallet balance for the vendor.
+
+        :return: list of balances (VendorWallet)
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path="wallets"
+        )
+        parsed = super()._parse_json(
+            input=api_result.body,
+            need_keys=[
+                payment_system.value for payment_system in VendorPaymentSystem
+            ]
+        )
+        result = VendorWallet()
+        for payment_system in VendorPaymentSystem:
+            payment_name = payment_system.value
+            setattr(result, payment_name, parsed[payment_name])
+        return result
+
+    def create_payout(self, receiver: str, method: VendorPaymentMethod, amount: int, fee: VendorPaymentSystem) -> None:
+        """
+        Withdraw money from the 5SIM vendor account.
+
+        :raises FiveSimError: if the response is invalid
+        """
+        super()._GET(
+            use_token=True,
+            path="withdraw",
+            data={
+                receiver: receiver,
+                method: method.value,
+                amount: str(amount),
+                fee: fee.value
+            }
+        )

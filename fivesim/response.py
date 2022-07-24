@@ -39,10 +39,14 @@ def _parse_guest_prices(input: dict[str, dict[str, Any]]) -> Any:
             )
 
         result = dict()
-        hasProductInformation = isinstance(next(iter(input.values())), ProductInformation)
+        hasProductInformation = isinstance(
+            next(iter(input.values())), ProductInformation
+        )
         if not hasProductInformation:
             # Get the first key of the first element, which is a dict
-            keyOfChildDictionary = next(iter(next(iter(input.values())).keys()))
+            keyOfChildDictionary = next(
+                iter(next(iter(input.values())).keys())
+            )
 
         for key, value in input.items():
             try:
@@ -95,3 +99,9 @@ def _parse_guest_countries(input: dict[str, dict[str, Any]]) -> Any:
         return result
     else:
         return input
+
+
+class VendorWallet(NamedTuple):
+    fkwallet: float
+    payeer: float
+    unitpay: float

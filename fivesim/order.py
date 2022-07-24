@@ -34,6 +34,18 @@ class Category(str, Enum):
     ACTIVATION = 'activation'
 
 
+class VendorPaymentMethod(str, Enum):
+    VISA = 'visa'
+    QIWI = 'qiwi'
+    YANDEX = 'yandex'
+
+
+class VendorPaymentSystem(str, Enum):
+    FKWALLET = 'fkwallet'
+    PAYEER = 'payeer'
+    UNITPAY = 'unitpay'
+
+
 class Operator(str, Enum):
     ANY_OPERATOR = 'any'
     N_019 = '019'

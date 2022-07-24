@@ -18,14 +18,15 @@ class _APIRequest:
         self.__endpoint = endpoint
         self.__authentication_token = auth_token
 
-    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool, params: dict) -> requests.Response:
+    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool, params: dict, json_data: str = None) -> requests.Response:
         headers = {"Accept": "application/json"}
         if use_token:
             headers["Authorization"] = "Bearer " + self.__authentication_token
         response = method(
             url=self.__endpoint + name,
             headers=headers,
-            params=params
+            params=params,
+            data=json_data
         )
         if response.status_code == 401:
             raise InvalidAPIKeyError
@@ -36,7 +37,7 @@ class _APIRequest:
         else:
             return response
 
-    def _GET(self, use_token: bool, path: str, parameters: Dict[str, str] = {}) -> _APIResult:
+    def _GET(self, use_token: bool, path: str, parameters: Dict[str, str] = {}, data: Dict[str, str] = None) -> _APIResult:
         """
         Make a GET request to the API.
 
@@ -49,7 +50,8 @@ class _APIRequest:
             method=requests.get,
             name=path,
             use_token=use_token,
-            params=parameters
+            params=parameters,
+            json_data=json.dumps(data)
         )
         return _APIResult(status_code=result.status_code, body=result.text, status_description=result.reason)
 
