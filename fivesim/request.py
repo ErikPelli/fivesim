@@ -18,7 +18,7 @@ class _APIRequest:
         self.__endpoint = endpoint
         self.__authentication_token = auth_token
 
-    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool, params: dict, json_data: str = None) -> requests.Response:
+    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool, params: dict, json_data: str) -> requests.Response:
         headers = {"Accept": "application/json"}
         if use_token:
             headers["Authorization"] = "Bearer " + self.__authentication_token
@@ -51,7 +51,7 @@ class _APIRequest:
             name=path,
             use_token=use_token,
             params=parameters,
-            json_data=json.dumps(data)
+            json_data=json.dumps(data) if data is not None else None
         )
         return _APIResult(status_code=result.status_code, body=result.text, status_description=result.reason)
 
@@ -68,7 +68,8 @@ class _APIRequest:
             method=requests.post,
             name=path,
             use_token=use_token,
-            params=parameters
+            params=parameters,
+            json_data=None
         )
         return _APIResult(status_code=result.status_code, body=result.text)
 
