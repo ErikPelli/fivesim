@@ -1,3 +1,4 @@
+from datetime import datetime
 from fivesim.order import(
     ActivationProduct,
     Category,
@@ -113,7 +114,7 @@ class VendorWallet(NamedTuple):
     unitpay: float
 
 
-class Profile(NamedTuple):
+class ProfileInformation(NamedTuple):
     id: int
     email: str
     vendor_name: str
@@ -136,7 +137,7 @@ def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
     elif "name" in input:
         return input
     else:
-        return Profile(
+        return ProfileInformation(
             id=input["id"],
             email=input["email"],
             vendor_name=input["vendor"],
@@ -146,4 +147,43 @@ def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
             rating=input["rating"],
             default_operator_name=input["default_operator"]["name"],
             default_country=input["default_country"]
+        )
+
+
+class Payment(NamedTuple):
+    id: str
+    type: str
+    provider: str
+    amount: float
+    balance: float
+    created_at: datetime
+
+
+class PaymentsHistory(NamedTuple):
+    data: list[Payment]
+    payment_types_names: list[str] | None
+    payment_providers_names: list[str] | None
+    payment_statuses_names: list[str] | None
+    total: int
+
+
+def _parse_payments_history(input: dict[str, dict[str, Any]]) -> Any:
+    if "Name" in input:
+        return input["Name"]
+    elif "ID" in input:
+        return Payment(
+            id=input["ID"],
+            type=input["TypeName"],
+            provider=input["ProviderName"],
+            amount=input["Amount"],
+            balance=input["Balance"],
+            created_at=datetime.fromisoformat(input["ID"]),
+        )
+    else:
+        return PaymentsHistory(
+            data=input["Data"],
+            payment_types_names=input["PaymentTypes"],
+            payment_providers_names=input["PaymentProviders"],
+            payment_statuses_names=input["PaymentStatuses"] if "PaymentStatuses" in input else None,
+            total=input["Total"]
         )

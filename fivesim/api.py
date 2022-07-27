@@ -12,12 +12,14 @@ from fivesim.order import(
 from fivesim.request import _APIRequest
 from fivesim.response import(
     CountryInformation,
+    PaymentsHistory,
     ProductInformation,
-    Profile,
+    ProfileInformation,
     VendorWallet,
     _parse_guest_countries,
     _parse_guest_prices,
     _parse_guest_products,
+    _parse_payments_history,
     _parse_profile_data
 )
 
@@ -26,7 +28,7 @@ class UserAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/user/", auth_token=api_key)
 
-    def get_user_data(self) -> Profile:
+    def get_user_data(self) -> ProfileInformation:
         """
         Get data about the user account.
 
@@ -42,7 +44,7 @@ class UserAPI(_APIRequest):
             into_object=_parse_profile_data
         )
 
-    def get_vendor_data(self) -> Profile:
+    def get_vendor_data(self) -> ProfileInformation:
         """
         Get data about the vendor account (available only for vendors).
 
@@ -89,7 +91,7 @@ class UserAPI(_APIRequest):
             need_keys=["Data", "ProductNames", "Statuses", "Total"]
         )
 
-    def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int | None]:
+    def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> PaymentsHistory:
         """
         Get the user payments history.
 
@@ -97,7 +99,7 @@ class UserAPI(_APIRequest):
         :param page_number: Number of the page to get, starting from 0 (first)
         :param order_by_field: Order the results by a specific field, default is "id"
         :param reverse_order: Show the results in reverse order (has to do with the previous one)
-        :return: Dict with the list|None keys "Data", "PaymentProviders", "PaymentTypes" and the int key "Total"
+        :return: PaymentsHistory object
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = dict()
@@ -116,12 +118,7 @@ class UserAPI(_APIRequest):
         )
         return super()._parse_json(
             input=api_result.body,
-            need_keys=[
-                "Data",
-                "PaymentProviders",
-                "PaymentTypes",
-                "Total"
-            ]
+            into_object=_parse_payments_history
         )
 
 
@@ -270,7 +267,7 @@ class VendorAPI(_APIRequest):
             need_keys=["Data", "ProductNames", "Statuses", "Total"]
         )
 
-    def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int | None]:
+    def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> PaymentsHistory:
         """
         Get the vendor payments history.
 
@@ -278,7 +275,7 @@ class VendorAPI(_APIRequest):
         :param page_number: Number of the page to get, starting from 0 (first)
         :param order_by_field: Order the results by a specific field, default is "id"
         :param reverse_order: Show the results in reverse order (has to do with the previous one)
-        :return: Dict with the list|None keys "Data", "PaymentProviders", "PaymentStatuses", "PaymentTypes" and the int key "Total"
+        :return: PaymentHistory object
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = dict()
@@ -297,13 +294,7 @@ class VendorAPI(_APIRequest):
         )
         return super()._parse_json(
             input=api_result.body,
-            need_keys=[
-                "Data",
-                "PaymentProviders",
-                "PaymentStatuses",
-                "PaymentTypes",
-                "Total"
-            ]
+            into_object=_parse_payments_history
         )
 
     def create_payout(self, receiver: str, method: VendorPaymentMethod, amount: int, fee: VendorPaymentSystem) -> None:
