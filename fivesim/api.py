@@ -1,5 +1,5 @@
 from fivesim.errors import BadRequestError
-from fivesim.order import ActivationProduct, Country, HostingProduct, Language, Operator, VendorPaymentMethod, VendorPaymentSystem
+from fivesim.order import ActivationProduct, Category, Country, HostingProduct, Language, Operator, VendorPaymentMethod, VendorPaymentSystem
 from fivesim.request import _APIRequest
 from fivesim.response import CountryInformation, ProductInformation, VendorWallet, _parse_guest_countries, _parse_guest_prices, _parse_guest_products
 
@@ -135,10 +135,33 @@ class VendorAPI(_APIRequest):
             setattr(result, payment_name, parsed[payment_name])
         return result
 
-    def order_history(self):
-        pass
+    def orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None):
+        """
+        Get the vendor orders history
 
-    def payment_history(self):
+        :return: dict with the Array keys "Data", "ProductNames", "Statuses" and the Int key "Total"
+        :raises FiveSimError: if the response is invalid
+        """
+        params: dict[str, str] = {"category": category.value}
+        if results_per_page is not None:
+            params["limit"] = str(results_per_page)
+        if page_number is not None:
+            params["offset"] = str(page_number)
+        if order_by_field is not None:
+            params["order"] = order_by_field
+        if reverse_order is not None:
+            params["reverse"] = "true" if reverse_order else "false"
+        api_result = super()._GET(
+            use_token=True,
+            path="orders",
+            parameters=params
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            need_keys=["Data", "ProductNames", "Statuses", "Total"]
+        )
+
+    def payments_history(self):
         pass
 
     def create_payout(self, receiver: str, method: VendorPaymentMethod, amount: int, fee: VendorPaymentSystem) -> None:
