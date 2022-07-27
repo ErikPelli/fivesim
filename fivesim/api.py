@@ -13,12 +13,12 @@ from fivesim.request import _APIRequest
 from fivesim.response import(
     CountryInformation,
     ProductInformation,
-    VendorProfile,
+    Profile,
     VendorWallet,
     _parse_guest_countries,
     _parse_guest_prices,
     _parse_guest_products,
-    _parse_vendor_data
+    _parse_profile_data
 )
 
 
@@ -26,20 +26,27 @@ class UserAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/user/", auth_token=api_key)
 
-    def get_user_data(self):
-        pass
+    def get_user_data(self) -> Profile:
+        """
+        Get data about the user account.
 
-    def order_history(self):
-        pass
+        :return: Profile object with the data
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path="profile"
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_profile_data
+        )
 
-    def payments_history(self):
-        pass
-
-    def get_vendor_data(self) -> VendorProfile:
+    def get_vendor_data(self) -> Profile:
         """
         Get data about the vendor account (available only for vendors).
 
-        :return: dict of countries associated with their prefix and other data
+        :return: Profile object with the data
         :raises FiveSimError: if the response is invalid
         """
         api_result = super()._GET(
@@ -48,8 +55,14 @@ class UserAPI(_APIRequest):
         )
         return super()._parse_json(
             input=api_result.body,
-            into_object=_parse_vendor_data
+            into_object=_parse_profile_data
         )
+
+    def get_orders_history(self):
+        pass
+
+    def get_payments_history(self):
+        pass
 
 
 class GuestAPI(_APIRequest):
@@ -62,7 +75,7 @@ class GuestAPI(_APIRequest):
 
         :param country: Country selection, ANY_COUNTRY is possible
         :param operator: Operator selection, ANY_OPERATOR is possible
-        :return: dictionary with the association between a Product and its information
+        :return: Dict with the association between a Product and its information
         :raises FiveSimError: if the response is invalid
         """
         api_result = super()._GET(
@@ -109,7 +122,7 @@ class GuestAPI(_APIRequest):
         Get 5SIM notification.
 
         :param lang: Language of notification, Russian or English
-        :return: notification text
+        :return: Notification text
         """
         if lang != lang.ENGLISH and lang != lang.RUSSIAN:
             raise ValueError("Language must be english or russian")
@@ -126,7 +139,7 @@ class GuestAPI(_APIRequest):
         """
         Get a list of all countries and their information.
 
-        :return: dict of countries associated with their prefix and other data
+        :return: Dict of countries associated with their prefix and other data
         :raises FiveSimError: if the response is invalid
         """
         api_result = super()._GET(
@@ -147,7 +160,7 @@ class VendorAPI(_APIRequest):
         """
         Get the wallet balance for the vendor.
 
-        :return: list of balances (VendorWallet)
+        :return: List of balances (VendorWallet)
         :raises FiveSimError: if the response is invalid
         """
         api_result = super()._GET(
@@ -170,7 +183,12 @@ class VendorAPI(_APIRequest):
         """
         Get the vendor orders history.
 
-        :return: dict with the Array keys "Data", "ProductNames", "Statuses" and the Int key "Total"
+        :param category: Category of the orders requested
+        :param results_per_page: Number of results to show on every page
+        :param page_number: Number of the page to get, starting from 0 (first)
+        :param order_by_field: Order the results by a specific field, default is "id"
+        :param reverse_order: Show the results in reverse order (has to do with the previous one)
+        :return: Dict with the list keys "Data", "ProductNames", "Statuses" and the int key "Total"
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = {"category": category.value}
@@ -196,7 +214,11 @@ class VendorAPI(_APIRequest):
         """
         Get the vendor payments history.
 
-        :return: dict with the Array keys "Data", "PaymentProviders", "PaymentStatuses", "PaymentTypes" and the Int key "Total"
+        :param results_per_page: Number of results to show on every page
+        :param page_number: Number of the page to get, starting from 0 (first)
+        :param order_by_field: Order the results by a specific field, default is "id"
+        :param reverse_order: Show the results in reverse order (has to do with the previous one)
+        :return: Dict with the list|None keys "Data", "PaymentProviders", "PaymentStatuses", "PaymentTypes" and the int key "Total"
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = dict()
@@ -228,6 +250,10 @@ class VendorAPI(_APIRequest):
         """
         Withdraw money from the 5SIM vendor account.
 
+        :param receiver: Payout receiver number
+        :param method: Payment output method
+        :param amount: Amount of the opyment
+        :param fee: Payment executor
         :raises FiveSimError: if the response is invalid
         """
         super()._GET(

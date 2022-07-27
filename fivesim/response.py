@@ -113,7 +113,7 @@ class VendorWallet(NamedTuple):
     unitpay: float
 
 
-class VendorProfile(NamedTuple):
+class Profile(NamedTuple):
     id: int
     email: str
     vendor_name: str
@@ -125,7 +125,7 @@ class VendorProfile(NamedTuple):
     default_country: CountryInformation
 
 
-def _parse_vendor_data(input: dict[str, dict[str, Any]]) -> Any:
+def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
     if "iso" in input:
         return CountryInformation(
             iso=input["iso"],
@@ -136,7 +136,7 @@ def _parse_vendor_data(input: dict[str, dict[str, Any]]) -> Any:
     elif "name" in input:
         return input
     else:
-        return VendorProfile(
+        return Profile(
             id=input["id"],
             email=input["email"],
             vendor_name=input["vendor"],
