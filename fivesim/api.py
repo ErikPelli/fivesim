@@ -100,6 +100,9 @@ class VendorAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/vendor/", auth_token=api_key)
 
+    def statistic(self):
+        pass
+
     def get_wallets_reserve(self) -> VendorWallet:
         """
         Get the wallet balance for the vendor.
@@ -122,6 +125,12 @@ class VendorAPI(_APIRequest):
             payment_name = payment_system.value
             setattr(result, payment_name, parsed[payment_name])
         return result
+
+    def order_history(self):
+        pass
+
+    def payment_history(self):
+        pass
 
     def create_payout(self, receiver: str, method: VendorPaymentMethod, amount: int, fee: VendorPaymentSystem) -> None:
         """
