@@ -137,7 +137,7 @@ class VendorAPI(_APIRequest):
 
     def orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None):
         """
-        Get the vendor orders history
+        Get the vendor orders history.
 
         :return: dict with the Array keys "Data", "ProductNames", "Statuses" and the Int key "Total"
         :raises FiveSimError: if the response is invalid
@@ -161,8 +161,31 @@ class VendorAPI(_APIRequest):
             need_keys=["Data", "ProductNames", "Statuses", "Total"]
         )
 
-    def payments_history(self):
-        pass
+    def payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None):
+        """
+        Get the vendor payments history.
+
+        :return: dict with the Array keys "Data", "PaymentProviders", "PaymentStatuses", "PaymentTypes" and the Int key "Total"
+        :raises FiveSimError: if the response is invalid
+        """
+        params: dict[str, str] = dict()
+        if results_per_page is not None:
+            params["limit"] = str(results_per_page)
+        if page_number is not None:
+            params["offset"] = str(page_number)
+        if order_by_field is not None:
+            params["order"] = order_by_field
+        if reverse_order is not None:
+            params["reverse"] = "true" if reverse_order else "false"
+        api_result = super()._GET(
+            use_token=True,
+            path="orders",
+            parameters=params
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            need_keys=["Data", "PaymentProviders", "PaymentStatuses", "PaymentTypes", "Total"]
+        )
 
     def create_payout(self, receiver: str, method: VendorPaymentMethod, amount: int, fee: VendorPaymentSystem) -> None:
         """
