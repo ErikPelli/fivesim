@@ -1,4 +1,10 @@
-from fivesim.order import ActivationProduct, Category, Country, HostingProduct, Operator
+from fivesim.order import(
+    ActivationProduct,
+    Category,
+    Country,
+    HostingProduct,
+    Operator
+)
 from typing import Any, NamedTuple
 
 
@@ -105,3 +111,39 @@ class VendorWallet(NamedTuple):
     fkwallet: float
     payeer: float
     unitpay: float
+
+
+class VendorProfile(NamedTuple):
+    id: int
+    email: str
+    vendor_name: str
+    forwarding_number: str
+    balance: float
+    frozen_balance: float
+    rating: float
+    default_operator_name: str
+    default_country: CountryInformation
+
+
+def _parse_vendor_data(input: dict[str, dict[str, Any]]) -> Any:
+    if "iso" in input:
+        return CountryInformation(
+            iso=input["iso"],
+            prefix=input["prefix"],
+            en=input["name"],
+            ru=input["name"],
+        )
+    elif "name" in input:
+        return input
+    else:
+        return VendorProfile(
+            id=input["id"],
+            email=input["email"],
+            vendor_name=input["vendor"],
+            forwarding_number=input["default_forwarding_number"],
+            balance=input["balance"],
+            frozen_balance=input["frozen_balance"],
+            rating=input["rating"],
+            default_operator_name=input["default_operator"]["name"],
+            default_country=input["default_country"]
+        )

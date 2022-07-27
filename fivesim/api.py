@@ -1,14 +1,32 @@
 from fivesim.errors import BadRequestError
-from fivesim.order import ActivationProduct, Category, Country, HostingProduct, Language, Operator, VendorPaymentMethod, VendorPaymentSystem
+from fivesim.order import(
+    ActivationProduct,
+    Category,
+    Country,
+    HostingProduct,
+    Language,
+    Operator,
+    VendorPaymentMethod,
+    VendorPaymentSystem
+)
 from fivesim.request import _APIRequest
-from fivesim.response import CountryInformation, ProductInformation, VendorWallet, _parse_guest_countries, _parse_guest_prices, _parse_guest_products
+from fivesim.response import(
+    CountryInformation,
+    ProductInformation,
+    VendorProfile,
+    VendorWallet,
+    _parse_guest_countries,
+    _parse_guest_prices,
+    _parse_guest_products,
+    _parse_vendor_data
+)
 
 
 class UserAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/user/", auth_token=api_key)
 
-    def balance_request(self):
+    def get_user_data(self):
         pass
 
     def order_history(self):
@@ -16,6 +34,22 @@ class UserAPI(_APIRequest):
 
     def payments_history(self):
         pass
+
+    def get_vendor_data(self) -> VendorProfile:
+        """
+        Get data about the vendor account (available only for vendors).
+
+        :return: dict of countries associated with their prefix and other data
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path="vendor"
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_vendor_data
+        )
 
 
 class GuestAPI(_APIRequest):
@@ -109,9 +143,6 @@ class VendorAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/vendor/", auth_token=api_key)
 
-    def statistic(self):
-        pass
-
     def get_wallets_reserve(self) -> VendorWallet:
         """
         Get the wallet balance for the vendor.
@@ -135,7 +166,7 @@ class VendorAPI(_APIRequest):
             setattr(result, payment_name, parsed[payment_name])
         return result
 
-    def orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int]:
+    def get_orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int]:
         """
         Get the vendor orders history.
 
@@ -161,7 +192,7 @@ class VendorAPI(_APIRequest):
             need_keys=["Data", "ProductNames", "Statuses", "Total"]
         )
 
-    def payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int | None]:
+    def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int | None]:
         """
         Get the vendor payments history.
 
@@ -179,7 +210,7 @@ class VendorAPI(_APIRequest):
             params["reverse"] = "true" if reverse_order else "false"
         api_result = super()._GET(
             use_token=True,
-            path="orders",
+            path="payments",
             parameters=params
         )
         return super()._parse_json(
