@@ -135,7 +135,7 @@ class VendorAPI(_APIRequest):
             setattr(result, payment_name, parsed[payment_name])
         return result
 
-    def orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None):
+    def orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int]:
         """
         Get the vendor orders history.
 
@@ -161,7 +161,7 @@ class VendorAPI(_APIRequest):
             need_keys=["Data", "ProductNames", "Statuses", "Total"]
         )
 
-    def payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None):
+    def payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int | None]:
         """
         Get the vendor payments history.
 
@@ -184,7 +184,13 @@ class VendorAPI(_APIRequest):
         )
         return super()._parse_json(
             input=api_result.body,
-            need_keys=["Data", "PaymentProviders", "PaymentStatuses", "PaymentTypes", "Total"]
+            need_keys=[
+                "Data",
+                "PaymentProviders",
+                "PaymentStatuses",
+                "PaymentTypes",
+                "Total"
+            ]
         )
 
     def create_payout(self, receiver: str, method: VendorPaymentMethod, amount: int, fee: VendorPaymentSystem) -> None:
