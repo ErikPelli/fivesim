@@ -8,6 +8,15 @@ class UserAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/user/", auth_token=api_key)
 
+    def balance_request(self):
+        pass
+
+    def order_history(self):
+        pass
+
+    def payments_history(self):
+        pass
+
 
 class GuestAPI(_APIRequest):
     def __init__(self, api_key: str):
