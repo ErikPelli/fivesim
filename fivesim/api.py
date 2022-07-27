@@ -58,11 +58,71 @@ class UserAPI(_APIRequest):
             into_object=_parse_profile_data
         )
 
-    def get_orders_history(self):
-        pass
+    def get_orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int]:
+        """
+        Get the user orders history.
 
-    def get_payments_history(self):
-        pass
+        :param category: Category of the orders requested
+        :param results_per_page: Number of results to show on every page
+        :param page_number: Number of the page to get, starting from 0 (first)
+        :param order_by_field: Order the results by a specific field, default is "id"
+        :param reverse_order: Show the results in reverse order (has to do with the previous one)
+        :return: Dict with the list keys "Data", "ProductNames", "Statuses" and the int key "Total"
+        :raises FiveSimError: if the response is invalid
+        """
+        params: dict[str, str] = {"category": category.value}
+        if results_per_page is not None:
+            params["limit"] = str(results_per_page)
+        if page_number is not None:
+            params["offset"] = str(page_number)
+        if order_by_field is not None:
+            params["order"] = order_by_field
+        if reverse_order is not None:
+            params["reverse"] = "true" if reverse_order else "false"
+        api_result = super()._GET(
+            use_token=True,
+            path="orders",
+            parameters=params
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            need_keys=["Data", "ProductNames", "Statuses", "Total"]
+        )
+
+    def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int | None]:
+        """
+        Get the user payments history.
+
+        :param results_per_page: Number of results to show on every page
+        :param page_number: Number of the page to get, starting from 0 (first)
+        :param order_by_field: Order the results by a specific field, default is "id"
+        :param reverse_order: Show the results in reverse order (has to do with the previous one)
+        :return: Dict with the list|None keys "Data", "PaymentProviders", "PaymentTypes" and the int key "Total"
+        :raises FiveSimError: if the response is invalid
+        """
+        params: dict[str, str] = dict()
+        if results_per_page is not None:
+            params["limit"] = str(results_per_page)
+        if page_number is not None:
+            params["offset"] = str(page_number)
+        if order_by_field is not None:
+            params["order"] = order_by_field
+        if reverse_order is not None:
+            params["reverse"] = "true" if reverse_order else "false"
+        api_result = super()._GET(
+            use_token=True,
+            path="payments",
+            parameters=params
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            need_keys=[
+                "Data",
+                "PaymentProviders",
+                "PaymentTypes",
+                "Total"
+            ]
+        )
 
 
 class GuestAPI(_APIRequest):
