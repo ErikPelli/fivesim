@@ -12,6 +12,7 @@ from fivesim.order import(
 from fivesim.request import _APIRequest
 from fivesim.response import(
     CountryInformation,
+    OrdersHistory,
     PaymentsHistory,
     ProductInformation,
     ProfileInformation,
@@ -19,6 +20,7 @@ from fivesim.response import(
     _parse_guest_countries,
     _parse_guest_prices,
     _parse_guest_products,
+    _parse_orders_history,
     _parse_payments_history,
     _parse_profile_data
 )
@@ -60,7 +62,7 @@ class UserAPI(_APIRequest):
             into_object=_parse_profile_data
         )
 
-    def get_orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int]:
+    def get_orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> OrdersHistory:
         """
         Get the user orders history.
 
@@ -69,7 +71,7 @@ class UserAPI(_APIRequest):
         :param page_number: Number of the page to get, starting from 0 (first)
         :param order_by_field: Order the results by a specific field, default is "id"
         :param reverse_order: Show the results in reverse order (has to do with the previous one)
-        :return: Dict with the list keys "Data", "ProductNames", "Statuses" and the int key "Total"
+        :return: OrdersHistory object
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = {"category": category.value}
@@ -88,7 +90,7 @@ class UserAPI(_APIRequest):
         )
         return super()._parse_json(
             input=api_result.body,
-            need_keys=["Data", "ProductNames", "Statuses", "Total"]
+            into_object=_parse_orders_history
         )
 
     def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> PaymentsHistory:
@@ -236,7 +238,7 @@ class VendorAPI(_APIRequest):
             setattr(result, payment_name, parsed[payment_name])
         return result
 
-    def get_orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> dict[str, list | int]:
+    def get_orders_history(self, category: Category, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> OrdersHistory:
         """
         Get the vendor orders history.
 
@@ -245,7 +247,7 @@ class VendorAPI(_APIRequest):
         :param page_number: Number of the page to get, starting from 0 (first)
         :param order_by_field: Order the results by a specific field, default is "id"
         :param reverse_order: Show the results in reverse order (has to do with the previous one)
-        :return: Dict with the list keys "Data", "ProductNames", "Statuses" and the int key "Total"
+        :return: OrdersHistory object
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = {"category": category.value}
@@ -264,7 +266,7 @@ class VendorAPI(_APIRequest):
         )
         return super()._parse_json(
             input=api_result.body,
-            need_keys=["Data", "ProductNames", "Statuses", "Total"]
+            into_object=_parse_orders_history
         )
 
     def get_payments_history(self, results_per_page: int = None, page_number: int = None, order_by_field: str = None, reverse_order: bool = None) -> PaymentsHistory:
@@ -275,7 +277,7 @@ class VendorAPI(_APIRequest):
         :param page_number: Number of the page to get, starting from 0 (first)
         :param order_by_field: Order the results by a specific field, default is "id"
         :param reverse_order: Show the results in reverse order (has to do with the previous one)
-        :return: PaymentHistory object
+        :return: PaymentsHistory object
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = dict()

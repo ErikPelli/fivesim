@@ -4,7 +4,8 @@ from fivesim.order import(
     Category,
     Country,
     HostingProduct,
-    Operator
+    Operator,
+    Status
 )
 from typing import Any, NamedTuple
 
@@ -177,7 +178,7 @@ def _parse_payments_history(input: dict[str, dict[str, Any]]) -> Any:
             provider=input["ProviderName"],
             amount=input["Amount"],
             balance=input["Balance"],
-            created_at=datetime.fromisoformat(input["ID"]),
+            created_at=datetime.fromisoformat(input["CreatedAt"]),
         )
     else:
         return PaymentsHistory(
@@ -185,5 +186,91 @@ def _parse_payments_history(input: dict[str, dict[str, Any]]) -> Any:
             payment_types_names=input["PaymentTypes"],
             payment_providers_names=input["PaymentProviders"],
             payment_statuses_names=input["PaymentStatuses"] if "PaymentStatuses" in input else None,
+            total=input["Total"]
+        )
+
+
+class SMS(NamedTuple):
+    id: int
+    created_at: datetime
+    received_at: datetime
+    sender: str
+    text: str
+    activation_code: str
+    is_wave: bool | None
+    wave_uuid: str | None
+
+
+class Order(NamedTuple):
+    id: int
+    phone: str
+    created_at: datetime
+    expires_at: datetime
+    operator: Operator | None
+    product: ActivationProduct | HostingProduct
+    country: Country | None
+    price: float
+    status: Status
+    sms: SMS | None
+    forwarding: bool | None
+    forwarding_number: str | None
+
+
+class OrdersHistory(NamedTuple):
+    data: list[Order]
+    order_product_names: list[str]
+    order_statuses_names: list[str]
+    total: int
+
+
+def _parse_sms(input: dict[str, dict[str, Any]]) -> Any:
+    return SMS(
+        id=input["id"] if "id" in input else input["ID"],
+        created_at=datetime.fromisoformat(input["created_at"]),
+        received_at=datetime.fromisoformat(input["date"]),
+        sender=input["sender"],
+        text=input["text"],
+        activation_code=input["code"],
+        is_wave=input["is_wave"] if "is_wave" in input else None,
+        wave_uuid=input["wave_uuid"] if "wave_uuid" in input else None
+    )
+
+
+def _parse_order(input: dict[str, dict[str, Any]]) -> Any:
+    try:
+        product = ActivationProduct(input["product"])
+    except:
+        try:
+            product = HostingProduct(input["product"])
+        except:
+            product = None
+    return Order(
+        id=input["id"],
+        phone=input["phone"],
+        created_at=datetime.fromisoformat(input["created_at"]),
+        expires_at=datetime.fromisoformat(input["expires"]),
+        operator=input["operator"] if "operator" in input else None,
+        product=product,
+        country=Country(input["phone"]) if "country" in input else None,
+        price=input["price"],
+        status=Status.from_status_string(input["status"]),
+        sms=input["sms"],
+        forwarding=input["forwarding"] if "forwarding" in input else None,
+        forwarding_number=input["forwarding_number"] if "forwarding_number" in input else None,
+    )
+
+
+def _parse_orders_history(input: dict[str, dict[str, Any]]) -> Any:
+    if any(i in input for i in ["Name", "name"]):
+        return input["Name"] if "Name" in input else input["name"]
+    elif "text" in input:
+        return _parse_sms(input)
+    elif "phone" in input:
+        return _parse_order(input)
+    else:
+        return OrdersHistory(
+            data=input["Data"],
+            order_product_names=input["ProductNames"],
+            order_statuses_names=input["Statuses"],
             total=input["Total"]
         )
