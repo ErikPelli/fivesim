@@ -10,7 +10,7 @@ from fivesim.enums import(
     VendorPaymentSystem
 )
 from fivesim.request import _APIRequest
-from fivesim.response import(
+from fivesim.json_response import(
     SMS,
     CountryInformation,
     Order,
