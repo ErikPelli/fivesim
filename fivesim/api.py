@@ -1,5 +1,5 @@
 from fivesim.errors import BadRequestError
-from fivesim.order import(
+from fivesim.enums import(
     ActivationProduct,
     Category,
     Country,

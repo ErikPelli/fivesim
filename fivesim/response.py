@@ -1,5 +1,5 @@
 from datetime import datetime
-from fivesim.order import(
+from fivesim.enums import(
     ActivationProduct,
     Category,
     Country,
