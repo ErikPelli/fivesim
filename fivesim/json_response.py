@@ -7,13 +7,17 @@ from fivesim.enums import(
     Operator,
     Status
 )
+from fivesim.response import(
+    CountryInformation,
+    Order,
+    OrdersHistory,
+    Payment,
+    PaymentsHistory,
+    ProductInformation,
+    ProfileInformation,
+    SMS
+)
 from typing import Any, NamedTuple
-
-
-class ProductInformation(NamedTuple):
-    category: Category
-    quantity: int
-    price: float
 
 
 def _parse_guest_products(input: dict[str, dict[str, Any]]) -> Any:
@@ -82,13 +86,6 @@ def _parse_guest_prices(input: dict[str, dict[str, Any]]) -> Any:
     return input
 
 
-class CountryInformation(NamedTuple):
-    iso: str
-    prefix: str
-    en: str
-    ru: str
-
-
 def _parse_guest_countries(input: dict[str, dict[str, Any]]) -> Any:
     if "iso" in input:
         return CountryInformation(
@@ -107,24 +104,6 @@ def _parse_guest_countries(input: dict[str, dict[str, Any]]) -> Any:
         return result
     else:
         return input
-
-
-class VendorWallet(NamedTuple):
-    fkwallet: float
-    payeer: float
-    unitpay: float
-
-
-class ProfileInformation(NamedTuple):
-    id: int
-    email: str
-    vendor_name: str
-    forwarding_number: str
-    balance: float
-    frozen_balance: float
-    rating: float
-    default_operator_name: str
-    default_country: CountryInformation
 
 
 def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
@@ -151,23 +130,6 @@ def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
         )
 
 
-class Payment(NamedTuple):
-    id: str
-    type: str
-    provider: str
-    amount: float
-    balance: float
-    created_at: datetime
-
-
-class PaymentsHistory(NamedTuple):
-    data: list[Payment]
-    payment_types_names: list[str] | None
-    payment_providers_names: list[str] | None
-    payment_statuses_names: list[str] | None
-    total: int
-
-
 def _parse_payments_history(input: dict[str, dict[str, Any]]) -> Any:
     if "Name" in input:
         return input["Name"]
@@ -188,43 +150,6 @@ def _parse_payments_history(input: dict[str, dict[str, Any]]) -> Any:
             payment_statuses_names=input["PaymentStatuses"] if "PaymentStatuses" in input else None,
             total=input["Total"]
         )
-
-
-class SMS(NamedTuple):
-    id: int
-    created_at: datetime
-    received_at: datetime
-    sender: str
-    text: str
-    activation_code: str
-    is_wave: bool | None
-    wave_uuid: str | None
-
-
-class Order(NamedTuple):
-    id: int
-    phone: str
-    created_at: datetime
-    expires_at: datetime
-    operator: Operator | None
-    product: ActivationProduct | HostingProduct
-    country: Country | None
-    price: float
-    status: Status
-    sms: list[SMS] | None
-    forwarding: bool | None
-    forwarding_number: str | None
-
-    @classmethod
-    def from_order_id(cls, order_id: int):
-        return cls(id=order_id)
-
-
-class OrdersHistory(NamedTuple):
-    data: list[Order]
-    order_product_names: list[str]
-    order_statuses_names: list[str]
-    total: int
 
 
 def _parse_sms(input: dict[str, dict[str, Any]]) -> Any:
