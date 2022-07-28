@@ -1,0 +1,27 @@
+[project]
+name = "fivesim"
+version = "1.0.0"
+description = "Python API client for 5sim.net"
+readme = "README.md"
+requires-python = ">=3.6"
+license= {file = "LICENSE"}
+keywords=["number", "telephone-numbers", "5sim", "fivesim", "python-5sim"]
+authors = [
+  {email = "erikpellizzon@gmail.com"},
+  {name = "Erik Pellizzon"}
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Software Development :: Libraries",
+  "Programming Language :: Python :: 3",
+  "Typing :: Typed"
+]
+dependencies = [
+  "requests"
+]
+
+[project.urls]
+documentation = "https://docs.5sim.net"
+repository = "https://github.com/ErikPelli/fivesim"
