@@ -11,6 +11,7 @@ from fivesim.order import(
 )
 from fivesim.request import _APIRequest
 from fivesim.response import(
+    SMS,
     CountryInformation,
     Order,
     OrdersHistory,
@@ -24,7 +25,8 @@ from fivesim.response import(
     _parse_order,
     _parse_orders_history,
     _parse_payments_history,
-    _parse_profile_data
+    _parse_profile_data,
+    _parse_sms_inbox
 )
 
 
@@ -178,6 +180,91 @@ class UserAPI(_APIRequest):
         super()._GET(
             use_token=True,
             path=f"reuse/{product.value}/{number}",
+        )
+
+    def check_order(self, order: Order) -> Order:
+        """
+        Check order and get SMS if it's finished.
+
+        :param order: Order object with a valid ID, from buy_number or using from_order_id method
+        :return: Parsed Order object
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path=f"check/{order.id}",
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_order
+        )
+
+    def finish_order(self, order: Order) -> Order:
+        """
+        Finish order, when you have obtained the SMS.
+
+        :param order: Order object with a valid ID, from buy_number or using from_order_id method
+        :return: Parsed Order object
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path=f"finish/{order.id}",
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_order
+        )
+
+    def cancel_order(self, order: Order) -> Order:
+        """
+        Cancel an order, when you haven't obtained the SMS yet.
+
+        :param order: Order object with a valid ID, from buy_number or using from_order_id method
+        :return: Parsed Order object
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path=f"cancel/{order.id}",
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_order
+        )
+
+    def ban_order(self, order: Order) -> Order:
+        """
+        Ban the number of the order.
+
+        :param order: Order object with a valid ID, from buy_number or using from_order_id method
+        :return: Parsed Order object
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path=f"ban/{order.id}",
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_order
+        )
+
+    def get_sms_inbox_list(self, order: Order) -> list[SMS]:
+        """
+        Get the list of SMS for an order ID.
+
+        :param order: Order object with a valid ID, from buy_number or using from_order_id method
+        :return: List of SMS
+        :raises FiveSimError: if the response is invalid
+        """
+        api_result = super()._GET(
+            use_token=True,
+            path=f"sms/inbox/{order.id}",
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_sms_inbox
         )
 
 
