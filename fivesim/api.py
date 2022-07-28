@@ -12,6 +12,7 @@ from fivesim.order import(
 from fivesim.request import _APIRequest
 from fivesim.response import(
     CountryInformation,
+    Order,
     OrdersHistory,
     PaymentsHistory,
     ProductInformation,
@@ -20,6 +21,7 @@ from fivesim.response import(
     _parse_guest_countries,
     _parse_guest_prices,
     _parse_guest_products,
+    _parse_order,
     _parse_orders_history,
     _parse_payments_history,
     _parse_profile_data
@@ -121,6 +123,48 @@ class UserAPI(_APIRequest):
         return super()._parse_json(
             input=api_result.body,
             into_object=_parse_payments_history
+        )
+
+    def buy_number(self, country: Country, operator: Operator, product: ActivationProduct | HostingProduct, forwarding_number: str = None, reuse: bool = False, voice: bool = False) -> Order:
+        """
+        Buy a 5SIM number, activation or hosting.
+
+        :param country: Target country, or ANY_COUNTRY
+        :param operator: Target operator, or ANY_OPERATOR
+        :param product: Product to buy
+        :param forwarding_number: Only with Activation, forward the call to a russian number (11 digits, without +)
+        :param reuse: Only with Activation, buy a reusable number in the future
+        :param voice: Only with Activation, receive a call from a robot in the requested number
+        :return: Order object
+        :raises FiveSimError: if the response is invalid
+        :raises ValueError: if the input parameters are invalid
+        """
+        params: dict[str, str] = dict()
+        if isinstance(product, ActivationProduct):
+            type = "activation"
+            if forwarding_number is not None:
+                if len(forwarding_number) != 11:
+                    raise ValueError("Invalid forwarding number")
+                params["forwarding"] = "true"
+                params["number"] = forwarding_number
+            if reuse:
+                params["reuse"] = "1"
+            if voice:
+                params["voice"] = "1"
+        elif isinstance(product, HostingProduct):
+            type = "hosting"
+            if forwarding_number is not None or reuse or voice:
+                raise ValueError("Parameters not supported with hosting")
+        else:
+            raise ValueError("Invalid product")
+        api_result = super()._GET(
+            use_token=True,
+            path=f"buy/{type}/{country.value}/{operator.value}/{product.value}",
+            parameters=params
+        )
+        return super()._parse_json(
+            input=api_result.body,
+            into_object=_parse_order
         )
 
     def reuse_number(self, product: ActivationProduct | HostingProduct, number: str) -> None:
