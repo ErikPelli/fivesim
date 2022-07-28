@@ -123,6 +123,19 @@ class UserAPI(_APIRequest):
             into_object=_parse_payments_history
         )
 
+    def reuse_number(self, product: ActivationProduct | HostingProduct, number: str) -> None:
+        """
+        Rebuy a 5SIM number, activation or hosting.
+
+        :param product: Product to rebuy
+        :param number: Telephone number to rebuy (with prefix, without + sign)
+        :raises FiveSimError: if the response is invalid
+        """
+        super()._GET(
+            use_token=True,
+            path=f"reuse/{product.value}/{number}",
+        )
+
 
 class GuestAPI(_APIRequest):
     def __init__(self, api_key: str):
