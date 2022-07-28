@@ -215,6 +215,10 @@ class Order(NamedTuple):
     forwarding: bool | None
     forwarding_number: str | None
 
+    @classmethod
+    def from_order_id(cls, order_id: int):
+        return cls(id=order_id)
+
 
 class OrdersHistory(NamedTuple):
     data: list[Order]
