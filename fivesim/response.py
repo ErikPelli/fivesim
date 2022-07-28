@@ -278,3 +278,10 @@ def _parse_orders_history(input: dict[str, dict[str, Any]]) -> Any:
             order_statuses_names=input["Statuses"],
             total=input["Total"]
         )
+
+
+def _parse_sms_inbox(input: dict[str, dict[str, Any]]) -> Any:
+    if "text" in input:
+        return _parse_sms(input)
+    else:
+        return input["Data"]
