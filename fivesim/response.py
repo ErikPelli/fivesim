@@ -211,7 +211,7 @@ class Order(NamedTuple):
     country: Country | None
     price: float
     status: Status
-    sms: SMS | None
+    sms: list[SMS] | None
     forwarding: bool | None
     forwarding_number: str | None
 
