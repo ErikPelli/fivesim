@@ -1,6 +1,19 @@
 from enum import Enum
 
 
+class OrderAction(str, Enum):
+    """
+    CHECK: Check order and get SMS if it's finished.
+    FINISH: Finish order, when you have obtained the SMS.
+    CANCEL: Cancel an order, when you haven't obtained the SMS yet.
+    BAN: Ban the number of the order.
+    """
+    CHECK = 'check'
+    FINISH = 'finish'
+    CANCEL = 'cancel'
+    BAN = 'ban'
+
+
 class Status(str, Enum):
     PENDING = 'preparation'
     RECEIVED = 'waiting of receipt of SMS'
