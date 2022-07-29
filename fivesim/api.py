@@ -6,6 +6,7 @@ from fivesim.enums import(
     HostingProduct,
     Language,
     Operator,
+    OrderAction,
     VendorPaymentMethod,
     VendorPaymentSystem
 )
@@ -20,7 +21,7 @@ from fivesim.json_response import(
     _parse_profile_data,
     _parse_sms_inbox
 )
-from fivesim.request import(
+from fivesim.response import(
     CountryInformation,
     Order,
     OrdersHistory,
@@ -184,9 +185,9 @@ class UserAPI(_APIRequest):
             path=f"reuse/{product.value}/{number}",
         )
 
-    def check_order(self, order: Order) -> Order:
+    def order(self, action: OrderAction, order: Order) -> Order:
         """
-        Check order and get SMS if it's finished.
+        Apply an action to the input order.
 
         :param order: Order object with a valid ID, from buy_number or using from_order_id method
         :return: Parsed Order object
@@ -194,58 +195,7 @@ class UserAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=True,
-            path=f"check/{order.id}",
-        )
-        return super()._parse_json(
-            input=api_result.body,
-            into_object=_parse_order
-        )
-
-    def finish_order(self, order: Order) -> Order:
-        """
-        Finish order, when you have obtained the SMS.
-
-        :param order: Order object with a valid ID, from buy_number or using from_order_id method
-        :return: Parsed Order object
-        :raises FiveSimError: if the response is invalid
-        """
-        api_result = super()._GET(
-            use_token=True,
-            path=f"finish/{order.id}",
-        )
-        return super()._parse_json(
-            input=api_result.body,
-            into_object=_parse_order
-        )
-
-    def cancel_order(self, order: Order) -> Order:
-        """
-        Cancel an order, when you haven't obtained the SMS yet.
-
-        :param order: Order object with a valid ID, from buy_number or using from_order_id method
-        :return: Parsed Order object
-        :raises FiveSimError: if the response is invalid
-        """
-        api_result = super()._GET(
-            use_token=True,
-            path=f"cancel/{order.id}",
-        )
-        return super()._parse_json(
-            input=api_result.body,
-            into_object=_parse_order
-        )
-
-    def ban_order(self, order: Order) -> Order:
-        """
-        Ban the number of the order.
-
-        :param order: Order object with a valid ID, from buy_number or using from_order_id method
-        :return: Parsed Order object
-        :raises FiveSimError: if the response is invalid
-        """
-        api_result = super()._GET(
-            use_token=True,
-            path=f"ban/{order.id}",
+            path=f"{action.value}/{order.id}",
         )
         return super()._parse_json(
             input=api_result.body,
