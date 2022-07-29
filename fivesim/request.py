@@ -7,7 +7,9 @@ from fivesim.fivesim import FiveSim
 
 
 class _APIResult(NamedTuple):
-    '''A tuple with the HTTP Status Code and the Body of the Response'''
+    """
+    A tuple with the HTTP Status Code and the Body of the Response
+    """
     status_code: int
     status_description: str
     body: str
