@@ -37,32 +37,17 @@ class UserAPI(_APIRequest):
     def __init__(self, api_key: str):
         super().__init__(endpoint="https://5sim.net/v1/user/", auth_token=api_key)
 
-    def get_user_data(self) -> ProfileInformation:
+    def get_profile_data(self, vendor: bool = False) -> ProfileInformation:
         """
         Get data about the user account.
 
+        :params vendor: if true, get the vendor profile data, don't touch if you are a normal user
         :return: Profile object with the data
         :raises FiveSimError: if the response is invalid
         """
         api_result = super()._GET(
             use_token=True,
-            path="profile"
-        )
-        return super()._parse_json(
-            input=api_result.body,
-            into_object=_parse_profile_data
-        )
-
-    def get_vendor_data(self) -> ProfileInformation:
-        """
-        Get data about the vendor account (available only for vendors).
-
-        :return: Profile object with the data
-        :raises FiveSimError: if the response is invalid
-        """
-        api_result = super()._GET(
-            use_token=True,
-            path="vendor"
+            path="vendor" if vendor else "profile"
         )
         return super()._parse_json(
             input=api_result.body,
