@@ -21,6 +21,7 @@ class Status(str, Enum):
     TIMEOUT = 'a timeout'
     FINISHED = 'is complete'
     BANNED = 'number banned, when number already used'
+    INVALID = 'the status returned by the API is not defined'
 
     def get_description(self) -> str:
         """
@@ -29,12 +30,15 @@ class Status(str, Enum):
         return self.value
 
     @classmethod
-    def from_status_string(cls, status: str) -> str:
+    def from_status_string(cls, status: str):
         """
         Create a new instance of the Status enum.
         :param status: the uppercase key
         """
-        return cls[status]
+        try:
+            return cls[status]
+        except:
+            return Status.INVALID
 
 
 class Language(str, Enum):
