@@ -1,43 +1,54 @@
+from enum import Enum
+
+
+class ErrorType(str, Enum):
+    """
+    List of errors that can be handled individually by the user.
+    """
+    INVALID_API_KEY = "Unauthorized - Invalid API Key"
+    SERVER_ERROR = "internal error"
+    SERVER_OFFLINE = "server offline"
+    INVALID_RESULT = "json error"
+    NO_FREE_PHONES = "no free phones"
+    INCORRECT_COUNTRY = "country is incorrect"
+    INCORRECT_PRODUCT = "product is incorrect"
+    ORDER_NOT_FOUND = "order not found"
+    ORDER_EXPIRED = "order not found"
+    ORDER_HAS_SMS = "order has sms"
+    ORDER_NO_SMS = "order no sms"
+    HOSTING_ORDER = "hosting order"
+    RECORD_NOT_FOUND = "record not found"
+    API_KEY_LIMIT = "api limit is 100 requests per second"
+    LIMIT_ERROR = "ip address limit is 100 requests per second"
+    BALANCE_TOO_LOW = "not enough user balance"
+    RATING_TOO_LOW = "not enough rating"
+    BAD_COUNTRY = "bad country"
+    BAD_OPERATOR = "bad operator"
+    MISSING_COUNTRY = "select country"
+    MISSING_OPERATOR = "select operator"
+    MISSING_PRODUCT = "no product"
+    OTHER = ""
+
+    @classmethod
+    def contains(cls, value) -> bool:
+        try:
+            cls(value)
+        except:
+            return False
+        return True
+
+
 class FiveSimError(Exception):
     """
-    An error returned by the 5 SIM API
+    An error returned by the 5 SIM API.
     """
 
-    def get_message(self) -> str:
+    def __init__(self, type: ErrorType, description: str = None) -> None:
+        self.__type = type
+        super().__init__(description if description is not None else self.__type.value)
+
+    def get_description(self) -> str:
         return super.message if hasattr(super, "message") else ""
 
-
-class InvalidAPIKeyError(FiveSimError):
-    """
-    Raised when the API Key is invalid
-    """
-
-    def __init__(self) -> None:
-        super().__init__("Invalid API Key")
-
-
-class BadRequestError(FiveSimError):
-    """
-    Raised when there is an error, with its description
-    """
-
-    def __init__(self, description: str) -> None:
-        super().__init__(description)
-
-
-class InvalidResultError(FiveSimError):
-    """
-    Raised when the FiveSim response is invalid
-    """
-
-    def __init__(self, invalid_value: str) -> None:
-        super().__init__(invalid_value)
-
-
-class NoFreePhonesError(FiveSimError):
-    """
-    Raised when the phones are not available. Try again after a few seconds.
-    """
-
-    def __init__(self) -> None:
-        super().__init__("No free phones")
+    def get_error(self) -> ErrorType:
+        return self.__type

@@ -1,6 +1,6 @@
 import json
 import requests
-from fivesim.errors import BadRequestError, InvalidAPIKeyError, InvalidResultError, NoFreePhonesError
+from fivesim.errors import ErrorType, FiveSimError
 from fivesim.fivesim import FiveSim
 from typing import Any, Callable, Dict
 
@@ -14,20 +14,31 @@ class _APIRequest:
         headers = {"Accept": "application/json"}
         if use_token:
             headers["Authorization"] = "Bearer " + self.__authentication_token
-        response = method(
-            url=self.__endpoint + name,
-            headers=headers,
-            params=params,
-            data=json_data
-        )
-        if response.status_code == 401:
-            raise InvalidAPIKeyError
-        if response.status_code == 400:
-            raise BadRequestError(response.reason)
-        if response.status_code != 200:
-            raise FiveSim(str(response.status_code) + response.reason)
-        if response.text == "no free phones":
-            raise NoFreePhonesError
+        try:
+            response = method(
+                url=self.__endpoint + name,
+                headers=headers,
+                params=params,
+                data=json_data
+            )
+        except:
+            raise FiveSimError(ErrorType.OTHER, "Error with the HTTP request")
+        if not response.ok:
+            if response.status_code == 401:
+                raise FiveSimError(ErrorType.INVALID_API_KEY)
+            if response.status_code == 429:
+                raise FiveSimError(ErrorType.API_KEY_LIMIT)
+            if response.status_code == 503:
+                raise FiveSimError(ErrorType.LIMIT_ERROR)
+
+            if ErrorType.contains(response.reason):
+                raise FiveSimError(ErrorType(response.text))
+            elif ErrorType.contains(response.text):
+                raise FiveSimError(ErrorType(response.text))
+            else:
+                raise FiveSimError(ErrorType.OTHER, str(response.status_code) + response.reason + response.text)
+        elif "no free phones":
+            raise FiveSimError(ErrorType.NO_FREE_PHONES)
         return response
 
     def _GET(self, use_token: bool, path: str | list[str], parameters: Dict[str, str] = {}) -> str:
@@ -71,7 +82,7 @@ class _APIRequest:
 
         :param input: JSON data
         :return: Parsed dictionary
-        :raises InvalidResultError: when the requested keys aren't in the output
+        :raises FiveSimError: when the requested keys aren't in the output
         """
         try:
             result = json.loads(input, object_hook=into_object)
@@ -79,5 +90,5 @@ class _APIRequest:
             result = {}
         for key in need_keys:
             if not key in result:
-                raise InvalidResultError(input)
+                raise FiveSimError(ErrorType.INVALID_RESULT, input)
         return result
