@@ -1,6 +1,6 @@
 import json
 import requests
-from fivesim.errors import BadRequestError, InvalidAPIKeyError, InvalidResultError
+from fivesim.errors import BadRequestError, InvalidAPIKeyError, InvalidResultError, NoFreePhonesError
 from fivesim.fivesim import FiveSim
 from typing import Any, Callable, Dict
 
@@ -22,10 +22,12 @@ class _APIRequest:
         )
         if response.status_code == 401:
             raise InvalidAPIKeyError
-        elif response.status_code == 400:
+        if response.status_code == 400:
             raise BadRequestError(response.reason)
-        elif response.status_code != 200:
+        if response.status_code != 200:
             raise FiveSim(str(response.status_code) + response.reason)
+        if response.text == "no free phones":
+            raise NoFreePhonesError
         return response
 
     def _GET(self, use_token: bool, path: str | list[str], parameters: Dict[str, str] = {}) -> str:

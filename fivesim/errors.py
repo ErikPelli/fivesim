@@ -32,3 +32,12 @@ class InvalidResultError(FiveSimError):
 
     def __init__(self, invalid_value: str) -> None:
         super().__init__(invalid_value)
+
+
+class NoFreePhonesError(FiveSimError):
+    """
+    Raised when the phones are not available. Try again after a few seconds.
+    """
+
+    def __init__(self) -> None:
+        super().__init__("No free phones")
