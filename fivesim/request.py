@@ -1,18 +1,8 @@
 import json
 import requests
 from fivesim.errors import BadRequestError, InvalidAPIKeyError, InvalidResultError
-from typing import Any, Callable, Dict, NamedTuple
-
 from fivesim.fivesim import FiveSim
-
-
-class _APIResult(NamedTuple):
-    """
-    A tuple with the HTTP Status Code and the Body of the Response
-    """
-    status_code: int
-    status_description: str
-    body: str
+from typing import Any, Callable, Dict
 
 
 class _APIRequest:
@@ -20,7 +10,7 @@ class _APIRequest:
         self.__endpoint = endpoint
         self.__authentication_token = auth_token
 
-    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool, params: dict, json_data: str) -> requests.Response:
+    def __request(self, method: Callable[[Any], requests.Response], name: str, use_token: bool, params: dict, json_data: str | None) -> requests.Response:
         headers = {"Accept": "application/json"}
         if use_token:
             headers["Authorization"] = "Bearer " + self.__authentication_token
@@ -35,45 +25,42 @@ class _APIRequest:
         elif response.status_code == 400:
             raise BadRequestError(response.reason)
         elif response.status_code != 200:
-            raise FiveSim(response.reason)
-        else:
-            return response
+            raise FiveSim(str(response.status_code) + response.reason)
+        return response
 
-    def _GET(self, use_token: bool, path: str, parameters: Dict[str, str] = {}, data: Dict[str, str] = None) -> _APIResult:
+    def _GET(self, use_token: bool, path: str | list[str], parameters: Dict[str, str] = {}) -> str:
         """
         Make a GET request to the API.
 
         :param use_token: Specify wheter to include the authentication token in the request
         :param path: Specify the part after the domain to invoke in the API
-        :return: An object with the response values
+        :return: The body of the response
         :raises FiveSimError: if there is an error with the request
         """
-        result = self.__request(
+        return self.__request(
             method=requests.get,
-            name=path,
+            name="/".join(path),
             use_token=use_token,
             params=parameters,
-            json_data=json.dumps(data) if data is not None else None
-        )
-        return _APIResult(status_code=result.status_code, body=result.text, status_description=result.reason)
+            json_data=None
+        ).text
 
-    def _POST(self, use_token: bool, path: str, parameters: Dict[str, str] = {}) -> _APIResult:
+    def _POST(self, use_token: bool, path: str, data: Dict[str, str]) -> str:
         """
         Make a POST request to the API.
 
         :param use_token: Specify wheter to include the authentication token in the request
         :param path: Specify the part after the domain to invoke in the API
-        :return: An object with the response values
+        :return: The body of the response
         :raises FiveSimError: if there is an error with the request
         """
-        result = self.__request(
+        return self.__request(
             method=requests.post,
             name=path,
             use_token=use_token,
-            params=parameters,
-            json_data=None
-        )
-        return _APIResult(status_code=result.status_code, body=result.text)
+            params={},
+            json_data=json.dumps(data)
+        ).text
 
     @classmethod
     def _parse_json(cls, input: str, need_keys: list[str] = [], into_object: Callable[[dict], Any] = None) -> Dict:
@@ -88,9 +75,7 @@ class _APIRequest:
             result = json.loads(input, object_hook=into_object)
         except:
             result = {}
-
         for key in need_keys:
             if not key in result:
                 raise InvalidResultError(input)
-
         return result
