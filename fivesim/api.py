@@ -1,4 +1,3 @@
-from fivesim.errors import BadRequestError
 from fivesim.enums import(
     ActivationProduct,
     Category,
@@ -10,7 +9,7 @@ from fivesim.enums import(
     VendorPaymentMethod,
     VendorPaymentSystem
 )
-from fivesim.request import _APIRequest
+from fivesim.errors import BadRequestError
 from fivesim.json_response import(
     _parse_guest_countries,
     _parse_guest_prices,
@@ -21,6 +20,7 @@ from fivesim.json_response import(
     _parse_profile_data,
     _parse_sms_inbox
 )
+from fivesim.request import _APIRequest
 from fivesim.response import(
     CountryInformation,
     Order,
@@ -50,7 +50,7 @@ class UserAPI(_APIRequest):
             path="vendor" if vendor else "profile"
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_profile_data
         )
 
@@ -81,7 +81,7 @@ class UserAPI(_APIRequest):
             parameters=params
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_orders_history
         )
 
@@ -111,7 +111,7 @@ class UserAPI(_APIRequest):
             parameters=params
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_payments_history
         )
 
@@ -131,7 +131,7 @@ class UserAPI(_APIRequest):
         """
         params: dict[str, str] = dict()
         if isinstance(product, ActivationProduct):
-            type = "activation"
+            type = Category.ACTIVATION
             if forwarding_number is not None:
                 if len(forwarding_number) != 11:
                     raise ValueError("Invalid forwarding number")
@@ -142,18 +142,24 @@ class UserAPI(_APIRequest):
             if voice:
                 params["voice"] = "1"
         elif isinstance(product, HostingProduct):
-            type = "hosting"
+            type = Category.HOSTING
             if forwarding_number is not None or reuse or voice:
                 raise ValueError("Parameters not supported with hosting")
         else:
             raise ValueError("Invalid product")
         api_result = super()._GET(
             use_token=True,
-            path=f"buy/{type}/{country.value}/{operator.value}/{product.value}",
+            path=[
+                "buy",
+                type.value,
+                country.value,
+                operator.value,
+                product.value
+            ],
             parameters=params
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_order
         )
 
@@ -167,7 +173,7 @@ class UserAPI(_APIRequest):
         """
         super()._GET(
             use_token=True,
-            path=f"reuse/{product.value}/{number}",
+            path=["reuse", product.value, number]
         )
 
     def order(self, action: OrderAction, order: Order) -> Order:
@@ -180,10 +186,10 @@ class UserAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=True,
-            path=f"{action.value}/{order.id}",
+            path=[action.value, order.id]
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_order
         )
 
@@ -197,10 +203,10 @@ class UserAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=True,
-            path=f"sms/inbox/{order.id}",
+            path=["sms", "inbox", order.id]
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_sms_inbox
         )
 
@@ -220,10 +226,10 @@ class GuestAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=False,
-            path=f"products/{country}/{operator}"
+            path=["products", country.value, operator.value]
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_guest_products
         )
 
@@ -241,19 +247,19 @@ class GuestAPI(_APIRequest):
         :raises FiveSimError: if the response is invalid
         """
         params: dict[str, str] = dict()
-        if country != Country.ANY_COUNTRY and country is None:
-            params["country"] = country
+        if country != Country.ANY_COUNTRY and country is not None:
+            params["country"] = country.value
         if product is not None:
-            params["product"] = product
+            params["product"] = product.value
         api_result = super()._GET(
             use_token=False,
             path="prices",
             parameters=params
         )
-        if api_result.body == "null":
+        if api_result == "null":
             raise BadRequestError("Product isn't available for the country")
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_guest_prices
         )
 
@@ -269,9 +275,9 @@ class GuestAPI(_APIRequest):
         try:
             api_result = super()._GET(
                 use_token=True,
-                path=f"flash/{lang}"
+                path=["flash", lang.value]
             )
-            return super()._parse_json(input=api_result.body, need_keys=["text"])["text"]
+            return super()._parse_json(input=api_result, need_keys=["text"])["text"]
         except:
             return ""
 
@@ -287,7 +293,7 @@ class GuestAPI(_APIRequest):
             path="countries"
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_guest_countries
         )
 
@@ -308,7 +314,7 @@ class VendorAPI(_APIRequest):
             path="wallets"
         )
         parsed = super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             need_keys=[
                 payment_system.value for payment_system in VendorPaymentSystem
             ]
@@ -346,7 +352,7 @@ class VendorAPI(_APIRequest):
             parameters=params
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_orders_history
         )
 
@@ -376,7 +382,7 @@ class VendorAPI(_APIRequest):
             parameters=params
         )
         return super()._parse_json(
-            input=api_result.body,
+            input=api_result,
             into_object=_parse_payments_history
         )
 
@@ -390,7 +396,7 @@ class VendorAPI(_APIRequest):
         :param fee: Payment executor
         :raises FiveSimError: if the response is invalid
         """
-        super()._GET(
+        super()._POST(
             use_token=True,
             path="withdraw",
             data={
