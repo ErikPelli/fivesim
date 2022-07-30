@@ -17,7 +17,7 @@ from fivesim.response import(
     ProfileInformation,
     SMS
 )
-from typing import Any, NamedTuple
+from typing import Any
 
 
 def _parse_guest_products(input: dict[str, dict[str, Any]]) -> Any:
@@ -112,7 +112,7 @@ def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
             iso=input["iso"],
             prefix=input["prefix"],
             en=input["name"],
-            ru=input["name"],
+            ru=None,
         )
     elif "name" in input:
         return input
@@ -166,6 +166,9 @@ def _parse_sms(input: dict[str, dict[str, Any]]) -> Any:
 
 
 def _parse_order(input: dict[str, dict[str, Any]]) -> Any:
+    if "code" in input:
+        return _parse_sms(input)
+
     try:
         product = ActivationProduct(input["product"])
     except:
@@ -190,11 +193,9 @@ def _parse_order(input: dict[str, dict[str, Any]]) -> Any:
 
 
 def _parse_orders_history(input: dict[str, dict[str, Any]]) -> Any:
-    if any(i in input for i in ["Name", "name"]):
+    if "name" in input or "Name" in input:
         return input["Name"] if "Name" in input else input["name"]
-    elif "text" in input:
-        return _parse_sms(input)
-    elif "phone" in input:
+    elif "phone" in input or "code" in input:
         return _parse_order(input)
     else:
         return OrdersHistory(
@@ -206,7 +207,7 @@ def _parse_orders_history(input: dict[str, dict[str, Any]]) -> Any:
 
 
 def _parse_sms_inbox(input: dict[str, dict[str, Any]]) -> Any:
-    if "text" in input:
+    if "code" in input:
         return _parse_sms(input)
     else:
         return input["Data"]

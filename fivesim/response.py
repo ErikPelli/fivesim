@@ -7,7 +7,7 @@ from fivesim.enums import(
     Operator,
     Status
 )
-from typing import Any, NamedTuple
+from typing import NamedTuple
 
 
 class ProductInformation(NamedTuple):
@@ -20,7 +20,7 @@ class CountryInformation(NamedTuple):
     iso: str
     prefix: str
     en: str
-    ru: str
+    ru: str | None
 
 
 class VendorWallet(NamedTuple):
