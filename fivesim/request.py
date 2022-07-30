@@ -1,7 +1,6 @@
 import json
 import requests
 from fivesim.errors import ErrorType, FiveSimError
-from fivesim.fivesim import FiveSim
 from typing import Any, Callable, Dict
 
 
@@ -32,12 +31,15 @@ class _APIRequest:
                 raise FiveSimError(ErrorType.LIMIT_ERROR)
 
             if ErrorType.contains(response.reason):
-                raise FiveSimError(ErrorType(response.text))
+                raise FiveSimError(ErrorType(response.reason))
             elif ErrorType.contains(response.text):
                 raise FiveSimError(ErrorType(response.text))
             else:
-                raise FiveSimError(ErrorType.OTHER, str(response.status_code) + response.reason + response.text)
-        elif "no free phones":
+                raise FiveSimError(
+                    ErrorType.OTHER,
+                    str(response.status_code) + response.reason + response.text
+                )
+        elif response.text == "no free phones":
             raise FiveSimError(ErrorType.NO_FREE_PHONES)
         return response
 
