@@ -1,4 +1,14 @@
 # 5sim
+At the moment this is the most advanced FiveSim API library, and tries to map responses to Python objects as much as possible.
+
+This library is unofficial and is not directly linked to the website in question.
+
+It was created out of need to use their API easily, without having to handle all possible cases in the application.
+
+## Install
+```
+pip install fivesim
+```
 
 ## Introduction
 5SIM is a service for receiving SMS and activating accounts on any site that require SMS verification, without using your personal number to avoid spam in future.
@@ -30,13 +40,6 @@ Highest possible rating is 96 points.
 | Timeout                                         | -0.35           |
 
 If rating drops to zero, you will not be able order within 24 hours. After 24 hours, rating will return to initial value of 8 points.
-
-## Library
-This library is unofficial and is not directly linked to the website in question.
-
-It was created out of need to use their API easily, without having to handle all possible cases in the application.
-
-At the time of its creation, there were no such libraries.
 
 ## Examples
 
