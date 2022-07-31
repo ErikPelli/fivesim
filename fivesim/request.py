@@ -21,7 +21,7 @@ class _APIRequest:
                 data=json_data
             )
         except:
-            raise FiveSimError(ErrorType.OTHER, "Error with the HTTP request")
+            raise FiveSimError(ErrorType.REQUEST_ERROR)
         if not response.ok:
             if response.status_code == 401:
                 raise FiveSimError(ErrorType.INVALID_API_KEY)
@@ -43,7 +43,7 @@ class _APIRequest:
             raise FiveSimError(ErrorType.NO_FREE_PHONES)
         return response
 
-    def _GET(self, use_token: bool, path: str | list[str], parameters: Dict[str, str] = {}) -> str:
+    def _GET(self, use_token: bool, path: list[str], parameters: Dict[str, str] = {}) -> str:
         """
         Make a GET request to the API.
 
@@ -88,8 +88,8 @@ class _APIRequest:
         """
         try:
             result = json.loads(input, object_hook=into_object)
-        except:
-            result = {}
+        except Exception as e:
+            raise FiveSimError(ErrorType.INVALID_RESULT, e.message if hasattr(e, "message") else "")
         for key in need_keys:
             if not key in result:
                 raise FiveSimError(ErrorType.INVALID_RESULT, input)
