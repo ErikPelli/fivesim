@@ -1,4 +1,4 @@
-from datetime import datetime
+import dateutil.parser
 from fivesim.enums import(
     ActivationProduct,
     Category,
@@ -111,8 +111,7 @@ def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
         return CountryInformation(
             iso=input["iso"],
             prefix=input["prefix"],
-            en=input["name"],
-            ru=None,
+            en=input["name"]
         )
     elif "name" in input:
         return input
@@ -120,13 +119,13 @@ def _parse_profile_data(input: dict[str, dict[str, Any]]) -> Any:
         return ProfileInformation(
             id=input["id"],
             email=input["email"],
-            vendor_name=input["vendor"],
-            forwarding_number=input["default_forwarding_number"],
+            vendor_name=input["vendor"] if "vendor" in input else "",
             balance=input["balance"],
             frozen_balance=input["frozen_balance"],
             rating=input["rating"],
             default_operator_name=input["default_operator"]["name"],
-            default_country=input["default_country"]
+            default_country=input["default_country"],
+            forwarding_number=input["default_forwarding_number"] if "default_forwarding_number" in input else None
         )
 
 
@@ -140,7 +139,7 @@ def _parse_payments_history(input: dict[str, dict[str, Any]]) -> Any:
             provider=input["ProviderName"],
             amount=input["Amount"],
             balance=input["Balance"],
-            created_at=datetime.fromisoformat(input["CreatedAt"]),
+            created_at=dateutil.parser.isoparse(input["CreatedAt"]),
         )
     else:
         return PaymentsHistory(
@@ -154,9 +153,8 @@ def _parse_payments_history(input: dict[str, dict[str, Any]]) -> Any:
 
 def _parse_sms(input: dict[str, dict[str, Any]]) -> Any:
     return SMS(
-        id=input["id"] if "id" in input else input["ID"],
-        created_at=datetime.fromisoformat(input["created_at"]),
-        received_at=datetime.fromisoformat(input["date"]),
+        created_at=dateutil.parser.isoparse(input["created_at"]),
+        received_at=dateutil.parser.isoparse(input["date"]),
         sender=input["sender"],
         text=input["text"],
         activation_code=input["code"],
@@ -179,11 +177,11 @@ def _parse_order(input: dict[str, dict[str, Any]]) -> Any:
     return Order(
         id=input["id"],
         phone=input["phone"],
-        created_at=datetime.fromisoformat(input["created_at"]),
-        expires_at=datetime.fromisoformat(input["expires"]),
+        created_at=dateutil.parser.isoparse(input["created_at"]),
+        expires_at=dateutil.parser.isoparse(input["expires"]),
         operator=input["operator"] if "operator" in input else None,
         product=product,
-        country=Country(input["phone"]) if "country" in input else None,
+        country=Country(input["country"]) if "country" in input else None,
         price=input["price"],
         status=Status.from_status_string(input["status"]),
         sms=input["sms"],
