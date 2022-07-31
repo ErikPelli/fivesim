@@ -20,7 +20,7 @@ class CountryInformation(NamedTuple):
     iso: str
     prefix: str
     en: str
-    ru: str | None
+    ru: str | None = None
 
 
 class VendorWallet(NamedTuple):
@@ -33,12 +33,12 @@ class ProfileInformation(NamedTuple):
     id: int
     email: str
     vendor_name: str
-    forwarding_number: str
     balance: float
     frozen_balance: float
     rating: float
     default_operator_name: str
     default_country: CountryInformation
+    forwarding_number: str | None = None
 
 
 class Payment(NamedTuple):
@@ -52,21 +52,20 @@ class Payment(NamedTuple):
 
 class PaymentsHistory(NamedTuple):
     data: list[Payment]
-    payment_types_names: list[str] | None
-    payment_providers_names: list[str] | None
-    payment_statuses_names: list[str] | None
     total: int
+    payment_types_names: list[str] | None = None
+    payment_providers_names: list[str] | None = None
+    payment_statuses_names: list[str] | None = None
 
 
 class SMS(NamedTuple):
-    id: int
     created_at: datetime
     received_at: datetime
     sender: str
     text: str
     activation_code: str
-    is_wave: bool | None
-    wave_uuid: str | None
+    is_wave: bool | None = None
+    wave_uuid: str | None = None
 
 
 class Order(NamedTuple):
@@ -74,18 +73,26 @@ class Order(NamedTuple):
     phone: str
     created_at: datetime
     expires_at: datetime
-    operator: Operator | None
-    product: ActivationProduct | HostingProduct
-    country: Country | None
     price: float
     status: Status
-    sms: list[SMS] | None
-    forwarding: bool | None
-    forwarding_number: str | None
+    product: ActivationProduct | HostingProduct
+    operator: Operator | None = None
+    country: Country | None = None
+    sms: list[SMS] | None = None
+    forwarding: bool | None = None
+    forwarding_number: str | None = None
 
     @classmethod
     def from_order_id(cls, order_id: int):
-        return cls(id=order_id)
+        return cls(
+            id=order_id,
+            phone="",
+            created_at=datetime.min,
+            expires_at=datetime.min,
+            price=0,
+            status=Status.INVALID,
+            product=HostingProduct.ONE_DAY
+        )
 
 
 class OrdersHistory(NamedTuple):
