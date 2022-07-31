@@ -9,7 +9,7 @@ from fivesim.enums import(
     VendorPaymentMethod,
     VendorPaymentSystem
 )
-from fivesim.errors import BadRequestError
+from fivesim.errors import ErrorType, FiveSimError
 from fivesim.json_response import(
     _parse_guest_countries,
     _parse_guest_prices,
@@ -47,7 +47,7 @@ class UserAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=True,
-            path="vendor" if vendor else "profile"
+            path=["vendor"] if vendor else ["profile"]
         )
         return super()._parse_json(
             input=api_result,
@@ -77,7 +77,7 @@ class UserAPI(_APIRequest):
             params["reverse"] = "true" if reverse_order else "false"
         api_result = super()._GET(
             use_token=True,
-            path="orders",
+            path=["orders"],
             parameters=params
         )
         return super()._parse_json(
@@ -107,7 +107,7 @@ class UserAPI(_APIRequest):
             params["reverse"] = "true" if reverse_order else "false"
         api_result = super()._GET(
             use_token=True,
-            path="payments",
+            path=["payments"],
             parameters=params
         )
         return super()._parse_json(
@@ -186,7 +186,7 @@ class UserAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=True,
-            path=[action.value, order.id]
+            path=[action.value, str(order.id)]
         )
         return super()._parse_json(
             input=api_result,
@@ -203,7 +203,7 @@ class UserAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=True,
-            path=["sms", "inbox", order.id]
+            path=["sms", "inbox", str(order.id)]
         )
         return super()._parse_json(
             input=api_result,
@@ -253,11 +253,12 @@ class GuestAPI(_APIRequest):
             params["product"] = product.value
         api_result = super()._GET(
             use_token=False,
-            path="prices",
+            path=["prices"],
             parameters=params
         )
         if api_result == "null":
-            raise BadRequestError("Product isn't available for the country")
+            raise FiveSimError(ErrorType.INCORRECT_PRODUCT,
+                               "Product isn't available for the country")
         return super()._parse_json(
             input=api_result,
             into_object=_parse_guest_prices
@@ -290,7 +291,7 @@ class GuestAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=False,
-            path="countries"
+            path=["countries"]
         )
         return super()._parse_json(
             input=api_result,
@@ -311,7 +312,7 @@ class VendorAPI(_APIRequest):
         """
         api_result = super()._GET(
             use_token=True,
-            path="wallets"
+            path=["wallets"]
         )
         parsed = super()._parse_json(
             input=api_result,
@@ -348,7 +349,7 @@ class VendorAPI(_APIRequest):
             params["reverse"] = "true" if reverse_order else "false"
         api_result = super()._GET(
             use_token=True,
-            path="orders",
+            path=["orders"],
             parameters=params
         )
         return super()._parse_json(
@@ -378,7 +379,7 @@ class VendorAPI(_APIRequest):
             params["reverse"] = "true" if reverse_order else "false"
         api_result = super()._GET(
             use_token=True,
-            path="payments",
+            path=["payments"],
             parameters=params
         )
         return super()._parse_json(

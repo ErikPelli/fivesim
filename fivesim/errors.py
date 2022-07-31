@@ -8,6 +8,7 @@ class ErrorType(str, Enum):
     INVALID_API_KEY = "Unauthorized - Invalid API Key"
     SERVER_ERROR = "internal error"
     SERVER_OFFLINE = "server offline"
+    REQUEST_ERROR = "error with the HTTP request"
     INVALID_RESULT = "json error"
     NO_FREE_PHONES = "no free phones"
     INCORRECT_COUNTRY = "country is incorrect"

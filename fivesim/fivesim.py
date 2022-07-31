@@ -1,4 +1,4 @@
-from api import UserAPI, GuestAPI, VendorAPI
+from fivesim.api import UserAPI, GuestAPI, VendorAPI
 
 
 class FiveSim:
