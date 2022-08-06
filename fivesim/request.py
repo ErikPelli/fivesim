@@ -30,9 +30,7 @@ class _APIRequest:
             if response.status_code == 503:
                 raise FiveSimError(ErrorType.LIMIT_ERROR)
 
-            if ErrorType.contains(response.reason):
-                raise FiveSimError(ErrorType(response.reason))
-            elif ErrorType.contains(response.text):
+            if ErrorType.contains(response.text):
                 raise FiveSimError(ErrorType(response.text))
             else:
                 raise FiveSimError(
