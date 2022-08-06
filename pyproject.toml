@@ -1,6 +1,6 @@
 [project]
 name = "fivesim"
-version = "1.0.1"
+version = "1.1.0"
 description = "Python API client for 5sim.net"
 readme = "README.md"
 requires-python = ">=3.6"
