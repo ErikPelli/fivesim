@@ -18,6 +18,7 @@ class ErrorType(str, Enum):
     ORDER_HAS_SMS = "order has sms"
     ORDER_NO_SMS = "order no sms"
     HOSTING_ORDER = "hosting order"
+    CANCEL_NEEDS_TIME = "you need to wait time"
     RECORD_NOT_FOUND = "record not found"
     API_KEY_LIMIT = "api limit is 100 requests per second"
     LIMIT_ERROR = "ip address limit is 100 requests per second"
