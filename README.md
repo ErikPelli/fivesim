@@ -25,21 +25,20 @@ When registering on social networks, messengers and on other sites, an SMS verif
 ## Rating System
 Actual rating is displayed in account settings, tab "General".
 
-Number of points rating equals number of orders that you can create simultaneously.
-
-Initial rating for new users is 8 points.
+Initial rating for new users is 96 points.
 
 Highest possible rating is 96 points.
 
 | Action                                          | Rating (points) |
-| ----------------------------------------------- | --------------- |
+|-------------------------------------------------|-----------------|
+| Add money into account                          | +8.0            |
 | Receive sms and finish the order before timeout | +0.5            |
-| Receive sms and order finished after timeout    | +0.25           |
-| Cancel                                          | -0.125          |
-| Ban number                                      | -0.125          |
-| Timeout                                         | -0.35           |
+| Automatic completed order after timeout         | +0.4            |
+| Cancel                                          | -0.1            |
+| Ban number                                      | -0.1            |
+| Timeout                                         | -0.15           |
 
-If rating drops to zero, you will not be able order within 24 hours. After 24 hours, rating will return to initial value of 8 points.
+If rating drops to zero, you will not be able order within 24 hours. After 24 hours, rating will return to initial value of 96 points.
 
 ## Examples
 
