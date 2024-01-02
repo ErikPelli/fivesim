@@ -42,6 +42,7 @@ class Status(str, Enum):
 
 
 class Language(str, Enum):
+    CHINESE = 'zh'
     ENGLISH = 'en'
     RUSSIAN = 'ru'
 
@@ -79,6 +80,7 @@ class Operator(str, Enum):
     MATRIX = 'matrix'
     MEGAFON = 'megafon'
     MTS = 'mts'
+    O2 = 'o2'
     ORANGE = 'orange'
     PILDYK = 'pildyk'
     PLAY = 'play'
@@ -118,6 +120,20 @@ class Operator(str, Enum):
     VIRTUAL30 = 'virtual30'
     VIRTUAL31 = 'virtual31'
     VIRTUAL32 = 'virtual32'
+    VIRTUAL33 = 'virtual33'
+    VIRTUAL34 = 'virtual34'
+    VIRTUAL35 = 'virtual35'
+    VIRTUAL36 = 'virtual36'
+    VIRTUAL37 = 'virtual37'
+    VIRTUAL38 = 'virtual38'
+    VIRTUAL40 = 'virtual40'
+    VIRTUAL41 = 'virtual41'
+    VIRTUAL47 = 'virtual47'
+    VIRTUAL49 = 'virtual49'
+    VIRTUAL50 = 'virtual50'
+    VIRTUAL51 = 'virtual51'
+    VIRTUAL52 = 'virtual52'
+    VIRTUAL53 = 'virtual53'
     VODAFONE = 'vodafone'
     YOTA = 'yota'
     ZZ = 'zz'
