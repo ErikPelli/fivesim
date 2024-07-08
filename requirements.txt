@@ -8,7 +8,7 @@ certifi==2024.7.4
     # via requests
 charset-normalizer==2.1.0
     # via requests
-idna==3.3
+idna==3.7
     # via requests
 python-dateutil==2.8.2
     # via fivesim (pyproject.toml)
