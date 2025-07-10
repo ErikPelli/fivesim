@@ -47,7 +47,14 @@ def _parse_guest_prices(input: dict[str, dict[str, Any]]) -> Any:
             return ProductInformation(
                 category=Category.ACTIVATION,
                 quantity=input["count"],
-                price=input["cost"]
+                price=input["cost"],
+                rate=input.get("rate"),
+                rate1=input.get("rate1"),
+                rate3=input.get("rate3"),
+                rate24=input.get("rate24"),
+                rate72=input.get("rate72"),
+                rate168=input.get("rate168"),
+                rate720=input.get("rate720")
             )
 
         result = dict()

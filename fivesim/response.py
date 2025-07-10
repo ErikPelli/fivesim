@@ -14,6 +14,13 @@ class ProductInformation(NamedTuple):
     category: Category
     quantity: int
     price: float
+    rate: float
+    rate1: float
+    rate3: float
+    rate24: float
+    rate72: float
+    rate168: float
+    rate720: float
 
 
 class CountryInformation(NamedTuple):
